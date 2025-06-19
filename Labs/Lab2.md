@@ -21,10 +21,12 @@ Each time the file is opened (e.g., using `cat`), a counter is incremented. The 
 #include <linux/fs.h>
 #include <linux/proc_fs.h>
 #include <linux/uaccess.h>
+#include <linux/sched.h>
+#include <linux/fdtable.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("KernelLab");
-MODULE_DESCRIPTION("Count file opens via /proc");
+MODULE_DESCRIPTION("Count open files per process via /proc");
 
 #define PROC_NAME "trace_opencount"
 
@@ -46,10 +48,9 @@ static ssize_t open_counter_read(struct file *file, char __user *buf, size_t cou
     return simple_read_from_buffer(buf, count, ppos, buffer, len);
 }
 
-static const struct file_operations open_counter_fops = {
-    .owner = THIS_MODULE,
-    .open = open_counter_open,
-    .read = open_counter_read,
+static const struct proc_ops open_counter_fops = {
+    .proc_open = open_counter_open,
+    .proc_read = open_counter_read,
 };
 
 static int __init open_counter_init(void)
