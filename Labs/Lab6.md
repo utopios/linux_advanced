@@ -13,7 +13,17 @@
 ### 2. Create a Btrfs RAID Volume
 
 * Create a Btrfs file system in RAID1 mode across two loop devices.
+```bash
+mkfs.btrfs -d raid1 -m raid1 /dev/loop10 /dev/loop11
+
+```
 * Mount the Btrfs filesystem on a mount point.
+
+```bash
+mkdir /mnt/btrfs
+mount /dev/loop10 /mnt/btrfs
+
+```
 
 ### 3. Create and Manage Subvolumes
 
@@ -21,11 +31,20 @@
 * Create a subvolume for `/home` (`@home`).
 * List the subvolumes and confirm their creation.
 
+```bash
+sudo btrfs subvolume create /mnt/btrfs/@
+sudo btrfs subvolume create /mnt/btrfs/@home
+```
+
 ### 4. Snapshot Management
 
 * Create a snapshot of the root subvolume.
 * List the snapshots.
 * Mount a snapshot if needed for inspection.
+
+```bash
+btrfs subvolume snapshot /mnt/btrfs/@ /mnt/btrfs/@_snapshot
+```
 
 ### 5. Add a New Disk to the RAID
 
