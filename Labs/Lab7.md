@@ -104,6 +104,7 @@ end
 * After the system boots into a shell:
 
   * Remount the root filesystem with write permissions
+  mount -o remount,rw /
   * Change the root password
   * Reboot the system
 
