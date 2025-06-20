@@ -62,7 +62,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "btrfs-lab" do |node|
     node.vm.hostname = "btrfs-lab"
-    node.vm.network "private_network", type: "dhcp"
     node.vm.provision "shell", inline: <<-SHELL
       apt-get update
       apt-get install -y btrfs-progs
