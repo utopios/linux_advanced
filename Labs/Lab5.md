@@ -70,4 +70,40 @@ end
 
 ---
 
+#### solutions
+
+```bash
+sudo wipefs -a /dev/sdb
+sudo wipefs -a /dev/sdc
+
+sudo pvcreate /dev/sdb
+sudo pvcreate /dev/sdc
+
+sudo pvdisplay
+
+sudo vgcreate vg_tp_lvm /dev/sdb /dev/sdc
+
+sudo vgdisplay
+
+sudo lvcreate -L 6G -n lv_system vg_tp_lvm
+sudo lvcreate -L 10G -n lv_data vg_tp_lvm
+sudo lvcreate -L 5G -n lv_backup vg_tp_lvm
+
+sudo lvdisplay
+
+sudo lvextend -L +2G /dev/vg_tp_lvm/lv_data
+
+sudo resize2fs /dev/vg_tp_lvm/lv_data
+
+
+sudo lvremove -y /dev/vg_tp_lvm/lv_system
+sudo lvremove -y /dev/vg_tp_lvm/lv_data
+sudo lvremove -y /dev/vg_tp_lvm/lv_backup
+
+sudo vgremove -y vg_tp_lvm
+
+sudo pvremove /dev/sdb
+sudo pvremove /dev/sdc
+
+```
 
