@@ -12,18 +12,44 @@ Use the following Vagrant configuration to create the required environment with 
 ```ruby
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/bookworm64"
-  config.vm.hostname = "grub-lab"
+  config.vm.hostname = "grub-gnome-lab"
 
   config.vm.provider "virtualbox" do |vb|
     vb.gui = true
-    vb.memory = 1024
+    vb.memory = 2048
+    vb.cpus = 2
   end
 
   config.vm.provision "shell", inline: <<-SHELL
-    sed -i 's/GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/' /etc/default/grub
-    sed -i 's/GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' /etc/default/grub
-    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=""/' /etc/default/grub
-    echo 'GRUB_TERMINAL=console' >> /etc/default/grub
+    export DEBIAN_FRONTEND=noninteractive
+
+    # Update and install full GNOME desktop
+    apt-get update
+    apt-get install -y task-gnome-desktop lightdm sudo
+
+    # Allow autologin for 'vagrant'
+    mkdir -p /etc/lightdm/lightdm.conf.d
+    echo "[Seat:*]" > /etc/lightdm/lightdm.conf.d/10-autologin.conf
+    echo "autologin-user=vagrant" >> /etc/lightdm/lightdm.conf.d/10-autologin.conf
+
+    # Add vagrant to sudoers if needed
+    usermod -aG sudo vagrant
+
+    # Enable graphical GRUB menu
+    sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' /etc/default/grub
+    sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/' /etc/default/grub
+    sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
+
+    # Install GRUB theme package (example: starfield or custom theme)
+    apt-get install -y grub2-themes
+
+    # Set a graphical theme (if available)
+    mkdir -p /boot/grub/themes/starfield
+    cp -r /usr/share/grub/themes/starfield/* /boot/grub/themes/starfield/
+
+    echo 'GRUB_THEME="/boot/grub/themes/starfield/theme.txt"' >> /etc/default/grub
+
+    # Rebuild GRUB config
     update-grub
   SHELL
 end
