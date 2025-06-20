@@ -9,3 +9,8 @@ make modules
 make modules_install
 
 sudo make install
+
+# Encrpytion disk
+
+sudo cryptsetup luksFormat /dev/sdd
+sudo cryptsetup open /dev/sdd name_disk => /dev/mapper/name_disk
