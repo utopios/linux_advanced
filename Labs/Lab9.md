@@ -30,7 +30,7 @@ def burn():
 for _ in range(150): threading.Thread(target=burn).start()
 " &
 
-stress-ng --vm 2 --vm-bytes 90% --timeout 120 &
+stress-ng --vm 10 --vm-bytes 99% --timeout 120 &
 
 mkdir -p /tmp/lab_io
 for i in $(seq 1 3000); do
@@ -44,6 +44,7 @@ lock = threading.Lock()
 def deadlock():
     lock.acquire()
     time.sleep(300)
+    lock.release()
 for _ in range(10): threading.Thread(target=deadlock).start()
 " &
 
