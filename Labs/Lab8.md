@@ -75,8 +75,11 @@ echo "Lab setup complete. Trainees can now begin the tasks."
 ### Phase 1: Service Discovery
 
 1. View the running service:
+systemctl status memhog.service
 
 2. Analyze recent logs:
+
+journalctl -u memhog.service
 
 3. Observe memory usage using:
 
@@ -87,6 +90,8 @@ echo "Lab setup complete. Trainees can now begin the tasks."
 
 4. Apply a hard memory limit to the service:
 
+systemctl set-property memhog.service MemoryMax=100M
+
 5. Wait for the service to exceed the limit and be killed by the kernel
 
 ---
@@ -95,8 +100,10 @@ echo "Lab setup complete. Trainees can now begin the tasks."
 
 6. Check logs after the kill event:
 
-7. Inspect kernel logs for OOM kill:
+sudo journalctl | grep -i "killed process"
 
+7. Inspect kernel logs for OOM kill:
+journalctl -k | grep -i oom
 
 ---
 
@@ -104,6 +111,11 @@ echo "Lab setup complete. Trainees can now begin the tasks."
 
 8. Create a custom rsyslog rule to redirect OOM logs:
 
+### /etc/rsyslog.d/oom-filter.conf
+:msg, contains; "out of memory" /var/log/oom.log & stop
+
 9. Restart rsyslog:
+
+systemctl restart rsyslog
 
 10. Re-trigger the OOM and verify:
